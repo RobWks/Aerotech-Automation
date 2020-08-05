@@ -1,0 +1,27 @@
+DVAR $micPort
+
+; Connect to micrometer
+$micPort = FILEOPEN "COM3", 2
+COMMINIT $micPort, "baud=115200 parity=N data=8 stop=1"
+COMMSETTIMEOUT $micPort, -1, -1, 1000
+
+IF $DO7.0 == 0 THEN
+	; Set relay bank to XZ measurement position by setting Digital out 7 low
+	$DO7.0=1
+
+	; Switch to XY Program on micrometer
+	FILEWRITE $micPort, "PW,4"
+	FILEREAD $micPort, 0, $strtask[0]
+
+ELSE
+	; Set relay bank to XY measurement position by setting Digital out 7 low
+	$DO7.0=0
+
+	; Switch to XY Program on micrometer
+	FILEWRITE $micPort, "PW,3"
+	FILEREAD $micPort, 0, $strtask[0]
+
+ENDIF
+
+; Close serial connection
+FILECLOSE $micPort

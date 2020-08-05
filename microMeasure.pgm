@@ -1,0 +1,303 @@
+; Script to align using the optical micrometer array
+; Written by Robert Weeks
+
+DVAR $fast_step
+DVAR $slow_step
+DVAR $fast_speed
+DVAR $slow_speed
+DVAR $micPort
+DVAR $micMeasure1
+DVAR $micMeasure2
+DVAR $invalid_read
+DVAR $reading_dwell
+DVAR $backstep
+DVAR $dist_to_correct_z
+DVAR $final_x_pos
+DVAR $final_y_pos
+DVAR $final_z_pos
+DVAR $hFile
+DVAR $axis_option
+DVAR $home_status
+DVAR $current_z_pos
+DVAR $axis_floor
+
+DVAR $A_x, $A_y, $A_z
+DVAR $B_x, $B_y, $B_z
+DVAR $C_x, $C_y, $C_z
+DVAR $D_x, $D_y, $D_z
+
+#define COMPARE_THRESHOLD 0.0001
+
+$fast_step = 0.2
+$slow_step = 0.1
+$fast_speed = 10
+$slow_speed = 2
+$reading_dwell = 1
+$invalid_read = 1
+$backstep = 1.0
+$axis_option = $A
+
+; Convert function argument to axis name
+IF $axis_option == 1 THEN
+	$strglob[0] = "A"
+	$axis_floor = -60
+ELSEIF $axis_option == 2 THEN
+	$strglob[0] = "B"
+	$axis_floor = -60
+ELSEIF $axis_option == 3 THEN
+	$strglob[0] = "C"
+	$axis_floor = -60
+ELSE
+	$strglob[0] = "D"
+	$axis_floor = -70
+ENDIF
+
+; Remind user that axes must be homed before alignment.
+$home_status = AXISSTATUS(X,DATAITEM_AxisStatus,AXISSTATUS_Homed) AND AXISSTATUS(Y,DATAITEM_AxisStatus,AXISSTATUS_Homed) AND AXISSTATUS(%$strglob[0]%,DATAITEM_AxisStatus,AXISSTATUS_Homed)
+IF NOT $home_status THEN
+	MSGBOX DF_MSGBOX_OKONLY + DF_ICON_CRITICAL, "Axes involved in alignment must be homed first. Please home and try again."
+	END PROGRAM
+ENDIF
+
+MSGDISPLAY 1, "Running alignment of Tool" $strglob[0]
+MSGSHOW
+
+; Deploy probe
+IF STRCMP($strglob[0],"D",0)== 0 THEN
+	$DO0.0=0
+ENDIF
+
+; Clear all current position offsets
+POSOFFSET CLEAR X Y U A B C D
+
+; Clear all fixture offsets
+G53
+
+; Connect to micrometer
+$micPort = FILEOPEN "COM3", 2
+COMMINIT $micPort, "baud=115200 parity=N data=8 stop=1"
+COMMSETTIMEOUT $micPort, -1, -1, 1000
+
+; Set relay bank to XY measurement position by setting Digital out 7 low
+$DO7.0=0
+
+; Switch to XY Program on micrometer
+FILEWRITE $micPort, "PW,3"
+FILEREAD $micPort, 0, $strtask[0]
+
+; Wait for relays
+DWELL 1.0
+
+WHILE $invalid_read DO
+	; Move quickly down towards micrometer
+	INCREMENTAL
+	$strglob[1] = DBLTOSTR(-$fast_step,1)
+	$strglob[2] = $strglob[0] + "=" + $strglob[1]
+	$aptglob[0] = $strglob[2]
+	LINEAR $aptglob[0] F$fast_speed
+	;LINEAR A-$fast_step F$fast_speed
+	
+	; Ask for measurement 1
+	FILEWRITE $micPort, "M1,0"
+	FILEREAD $micPort, 0, $strtask[0]
+
+	; See if reading is valid
+	IF STRCMP($strtask[0],"M1,---.-----",0) THEN
+		$invalid_read = 0
+	ELSE
+		$invalid_read = 1
+	END IF
+	
+	; Stop at some point if no nozzle is found (floor)
+	$current_z_pos = AXISSTATUS(%$strglob[0]%, DATAITEM_PositionFeedback)
+	IF $current_z_pos < $axis_floor THEN
+		MSGDISPLAY 1, "Tool" $strglob[0] "was not found"
+		MSGSHOW
+		; Close serial connection
+		FILECLOSE $micPort
+		GOTO programFail
+	END IF
+	
+ENDWHILE
+
+INCREMENTAL
+$strglob[1] = DBLTOSTR($backstep,1)
+$strglob[2] = $strglob[0] + "=" + $strglob[1]
+$aptglob[0] = $strglob[2]
+LINEAR $aptglob[0] F$slow_speed
+$invalid_read = 1
+
+WHILE $invalid_read DO
+	; Move slowly down towards micrometer
+	INCREMENTAL
+	$strglob[1] = DBLTOSTR(-$slow_step,1)
+	$strglob[2] = $strglob[0] + "=" + $strglob[1]
+	$aptglob[0] = $strglob[2]
+	LINEAR $aptglob[0] F$slow_speed
+	
+	; Ask for measurement 1
+	FILEWRITE $micPort, "M1,0"
+	FILEREAD $micPort, 0, $strtask[0]
+
+	; See if reading is valid
+	IF STRCMP($strtask[0],"M1,---.-----",0) THEN
+		$invalid_read = 0
+	ELSE
+		$invalid_read = 1
+	END IF
+	
+	; Stop at some point if no nozzle is found (floor)
+	$current_z_pos = AXISSTATUS(%$strglob[0]%, DATAITEM_PositionFeedback)
+	IF $current_z_pos < $axis_floor THEN
+		MSGDISPLAY 1, "Tool" $strglob[0] "was not found"
+		MSGSHOW
+		; Close serial connection
+		FILECLOSE $micPort
+		GOTO programFail
+	END IF
+	
+ENDWHILE
+
+; Value extraction of measure 1
+$strtask[1] = STRMID($strtask[0],4,10)
+
+; Sign extraction of measure 1
+$strtask[2] = STRMID($strtask[0],3,3)
+IF STRCMP($strtask[2],"+",0) THEN
+	$micMeasure1 = -1*STRTODBL($strtask[1])
+ELSE
+	$micMeasure1 = STRTODBL($strtask[1])
+END IF
+
+; Ask for measurement 2
+FILEWRITE $micPort, "M2,0"
+FILEREAD $micPort, 0, $strtask[0]
+
+; Value extraction of measure 2
+$strtask[1] = STRMID($strtask[0],4,10)
+
+; Sign extraction of measure 2
+$strtask[2] = STRMID($strtask[0],3,3)
+IF STRCMP($strtask[2],"+",0) THEN
+	$micMeasure2 = -1*STRTODBL($strtask[1])
+ELSE
+	$micMeasure2 = STRTODBL($strtask[1])
+END IF
+
+; Correct nozzle position
+INCREMENTAL
+LINEAR X-$micMeasure1 Y-$micMeasure2 F$slow_speed
+
+; Set relay bank to XZ measurement position by setting Digital out 7 high
+$DO7.0=1
+
+; Switch to XZ Program on micrometer
+FILEWRITE $micPort, "PW,4"
+FILEREAD $micPort, 0, $strtask[0]
+
+; Wait for relays
+DWELL 1.0
+
+; Ask for measurement 2
+FILEWRITE $micPort, "M2,0"
+FILEREAD $micPort, 0, $strtask[0]
+
+; Close serial connection
+FILECLOSE $micPort
+
+; Value extraction of measure 2
+$strtask[1] = STRMID($strtask[0],4,10)
+
+; Sign extraction of measure 2
+$strtask[2] = STRMID($strtask[0],3,3)
+IF STRCMP($strtask[2],"+",0) THEN
+	$micMeasure2 = -1*STRTODBL($strtask[1])
+ELSE
+	$micMeasure2 = STRTODBL($strtask[1])
+END IF
+
+; Correct nozzle position
+$dist_to_correct_z = 3.0 - $micMeasure2
+INCREMENTAL
+$strglob[1] = DBLTOSTR($dist_to_correct_z,5)
+$strglob[2] = $strglob[0] + "=" + $strglob[1]
+$aptglob[0] = $strglob[2]
+LINEAR $aptglob[0] F$slow_speed
+
+; Wait before measuring
+DWELL 2.0
+
+; Read in current alignment values
+$hFile = FILEOPEN "alignments.dat", 1
+FILEREAD $hFile, 0, $A_x, $A_y, $A_z
+FILEREAD $hFile, 0, $B_x, $B_y, $B_z
+FILEREAD $hFile, 0, $C_x, $C_y, $C_z
+FILEREAD $hFile, 0, $D_x, $D_y, $D_z
+FILECLOSE $hFile
+
+IF STRCMP($strglob[0],"A",0)== 0 THEN
+	$A_x =  AXISSTATUS(X, DATAITEM_PositionFeedback)
+	$A_y = AXISSTATUS(Y, DATAITEM_PositionFeedback)
+	$A_z = AXISSTATUS(%$strglob[0]%, DATAITEM_PositionFeedback)
+	
+	; Write resulting position to message box
+	MSGDISPLAY 1, "The measured position of tool" $strglob[0] "is: x:" $A_x " y:" $A_y " z:" $A_z
+	MSGSHOW
+
+ELSEIF STRCMP($strglob[0],"B",0)== 0 THEN
+	$B_x =  AXISSTATUS(X, DATAITEM_PositionFeedback)
+	$B_y = AXISSTATUS(Y, DATAITEM_PositionFeedback)
+	$B_z = AXISSTATUS(%$strglob[0]%, DATAITEM_PositionFeedback)
+	
+	; Write resulting position to message box
+	MSGDISPLAY 1, "The measured position of tool" $strglob[0] "is: x:" $B_x " y:" $B_y " z:" $B_z
+	MSGSHOW
+
+ELSEIF STRCMP($strglob[0],"C",0)== 0 THEN
+	$C_x =  AXISSTATUS(X, DATAITEM_PositionFeedback)
+	$C_y = AXISSTATUS(Y, DATAITEM_PositionFeedback)
+	$C_z = AXISSTATUS(%$strglob[0]%, DATAITEM_PositionFeedback)
+	
+	; Write resulting position to message box
+	MSGDISPLAY 1, "The measured position of tool" $strglob[0] "is: x:" $C_x " y:" $C_y " z:" $C_z
+	MSGSHOW
+
+ELSE
+	$D_x =  AXISSTATUS(X, DATAITEM_PositionFeedback)
+	$D_y = AXISSTATUS(Y, DATAITEM_PositionFeedback)
+	$D_z = AXISSTATUS(%$strglob[0]%, DATAITEM_PositionFeedback)
+	
+	; Adjust measure as probe goes slightly below 0.
+	$D_z = $D_z + 0.426200
+	
+	; Write resulting position to message box
+	MSGDISPLAY 1, "The measured position of probe is: x:" $D_x " y:" $D_y " z:" $D_z
+	MSGSHOW
+ENDIF
+
+; Write updated alignment values
+$hFile = FILEOPEN "alignments.dat", 0
+FILEWRITE $hFile, $A_x, " ", $A_y, " ", $A_z
+FILEWRITE $hFile, $B_x, " ", $B_y, " ", $B_z
+FILEWRITE $hFile, $C_x, " ", $C_y, " ", $C_z
+FILEWRITE $hFile, $D_x, " ", $D_y, " ", $D_z
+FILECLOSE $hFile
+
+:programFail
+
+; Retract probe
+IF STRCMP($strglob[0],"D",0)== 0 THEN
+	$DO0.0=1
+ENDIF
+
+; Move up and out of the way
+ABSOLUTE
+$strglob[2] = $strglob[0] + "=0"
+$aptglob[0] = $strglob[2]
+LINEAR $aptglob[0] F$fast_speed
+
+	
+
+
+
+

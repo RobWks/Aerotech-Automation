@@ -1,0 +1,50 @@
+; Script to handle recording probe position
+; Written by Robert Weeks
+
+DVAR $fast_step
+DVAR $slow_step
+DVAR $fast_speed
+DVAR $slow_speed
+DVAR $height
+DVAR $samples
+DVAR $total
+DVAR $loop_var
+DVAR $settle_time
+
+$fast_step = 0.2
+$slow_step = 0.1
+$fast_speed = 10
+$slow_speed = 2
+$samples = 1000
+$total = 0
+$settle_time = 5
+
+; Remove any current offsets
+POSOFFSET CLEAR D
+
+; Deploy probe
+$DO0.0=0
+DWELL $settle_time
+
+$height = ($AI0.0-0.888204)*(4.395305-0.888204)
+WHILE $height < 2 DO
+	; Move down towards micrometer
+	INCREMENTAL
+	LINEAR D-$slow_step F$slow_speed
+	$height = ($AI0.0-0.888204)*(4.395305-0.888204)
+	MSGDISPLAY 1, $height
+ENDWHILE
+
+DWELL $settle_time
+
+FOR $loop_var = 1 TO $samples
+	$total = $total + ($AI0.0-0.888204)*(4.395305-0.888204)
+NEXT
+$height = $total/$samples
+POSOFFSET SET D-$height
+
+; Retract probe
+$DO0.0=1
+
+ABSOLUTE
+LINEAR D80 F$fast_speed
