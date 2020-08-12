@@ -1,0 +1,27 @@
+DVAR $origin_x, $origin_y, $origin_z
+DVAR $cam_offset_x, $cam_offset_y
+DVAR $hFile
+
+MSGCLEAR -1
+MSGDISPLAY 1, "Running XY alignment using camera crosshairs."
+MSGSHOW
+
+$cam_offset_x = 33
+$cam_offset_y = 1.5
+
+; Read in current alignment values
+$hFile = FILEOPEN "probe_origin.dat", 1
+FILEREAD $hFile, 0, $origin_x, $origin_y, $origin_z
+FILECLOSE $hFile
+
+; Clear all fixture offsets
+G53
+POSOFFSET CLEAR X Y
+$origin_x =  AXISSTATUS(X, DATAITEM_PositionFeedback)-$cam_offset_x
+$origin_y = AXISSTATUS(Y, DATAITEM_PositionFeedback)-$cam_offset_y
+POSOFFSET SET X$cam_offset_x Y$cam_offset_y
+
+; Write updated origin location to file
+$hFile = FILEOPEN "probe_origin.dat", 0
+FILEWRITE $hFile, $origin_x, " ", $origin_y, " ", $origin_z
+FILECLOSE $hFile

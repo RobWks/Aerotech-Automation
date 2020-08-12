@@ -10,20 +10,20 @@
 ; Go to extruder C coordinate system
 #define G33 FARCALL "offsetManager.pgm" A3
 
-; Align probe in micrometer system
-#define G34 FARCALL "microMeasure.pgm" A4
-
 ; Align extruder A in micrometer system
-#define G35 FARCALL "microMeasure.pgm" A1
+#define G34 FARCALL "microMeasure.pgm" A1
 
 ; Align extruder B in micrometer system
-#define G36 FARCALL "microMeasure.pgm" A2
+#define G35 FARCALL "microMeasure.pgm" A2
 
 ; Align extruder C in micrometer system
-#define G37 FARCALL "microMeasure.pgm" A3
+#define G36 FARCALL "microMeasure.pgm" A3
 
-; Set XY origin using camera
-#define G38 POSOFFSET SET X33 Y1.5
+; Align extruder C in micrometer system
+#define G37 FARCALL "measureAll.pgm"
 
 ; Set Z origin using probe
-#define G39 FARCALL "probeMeasure.pgm"
+#define G38 FARCALL "probeMeasure.pgm"
+
+; Set XY origin using probe
+#define G39 FARCALL "XYalignCamera.pgm"

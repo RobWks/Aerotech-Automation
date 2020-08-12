@@ -1,0 +1,23 @@
+DVAR $origin_x, $origin_y, $origin_z	
+DVAR $hFile
+
+MSGCLEAR -1
+MSGDISPLAY 1, "Running XY alignment using probe position."
+MSGSHOW
+
+; Read in current alignment values
+$hFile = FILEOPEN "probe_origin.dat", 1
+FILEREAD $hFile, 0, $origin_x, $origin_y, $origin_z
+FILECLOSE $hFile
+
+; Clear all fixture offsets
+G53
+POSOFFSET CLEAR X Y
+$origin_x =  AXISSTATUS(X, DATAITEM_PositionFeedback)
+$origin_y = AXISSTATUS(Y, DATAITEM_PositionFeedback)
+POSOFFSET SET X0 Y0
+
+; Write updated origin location to file
+$hFile = FILEOPEN "probe_origin.dat", 0
+FILEWRITE $hFile, $origin_x, " ", $origin_y, " ", $origin_z
+FILECLOSE $hFile

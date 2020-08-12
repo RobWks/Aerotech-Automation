@@ -1,50 +1,111 @@
 ; Script to handle recording probe position
 ; Written by Robert Weeks
 
-DVAR $fast_step
-DVAR $slow_step
 DVAR $fast_speed
 DVAR $slow_speed
-DVAR $height
-DVAR $samples
-DVAR $total
-DVAR $loop_var
-DVAR $settle_time
+DVAR $backstep_speed
+DVAR $backstep_dist
+DVAR $measure_speed
+DVAR $origin_z
+DVAR $probe_dwell
+DVAR $hFile
+DVAR $old_origin_x, $old_origin_y, $old_origin_z
+DVAR $new_origin_z
 
-$fast_step = 0.2
-$slow_step = 0.1
 $fast_speed = 10
-$slow_speed = 2
-$samples = 1000
-$total = 0
-$settle_time = 5
+$slow_speed = 1
+$backstep_speed = 0.1
+$backstep_dist = 0.3
+$measure_speed = 0.01
+$probe_dwell = 2
+
+; Remind user that axes must be homed before alignment.
+IF NOT AXISSTATUS(D,DATAITEM_AxisStatus,AXISSTATUS_Homed) THEN
+	MSGBOX DF_MSGBOX_OKONLY + DF_ICON_CRITICAL, "Probe axis must be homed before aligning. Please home and try again."
+	END PROGRAM
+ENDIF
+
+MSGCLEAR -1
+MSGDISPLAY 1, "Running Z alignment using probe."
+MSGSHOW
 
 ; Remove any current offsets
+G53
 POSOFFSET CLEAR D
 
 ; Deploy probe
 $DO0.0=0
-DWELL $settle_time
+DWELL $probe_dwell
 
-$height = ($AI0.0-0.888204)*(4.395305-0.888204)
-WHILE $height < 2 DO
-	; Move down towards micrometer
-	INCREMENTAL
-	LINEAR D-$slow_step F$slow_speed
-	$height = ($AI0.0-0.888204)*(4.395305-0.888204)
-	MSGDISPLAY 1, $height
-ENDWHILE
+; The probe input changes to digital drive input 1 ($DI8.X).
+PROBE INPUT PROBE_INPUT_DRIVE_DIGITAL X 1
 
-DWELL $settle_time
+; The scanning mode changes to hardware scanning mode.
+; The controller writes the captured positions to $global[4].
+PROBE MODE PROBE_SW_MODE 1 $origin_z
+				
+; Starts probe monitoring.
+PROBE ON D
+				
+; Moves probe down to floor 
+ABSOLUTE
+LINEAR D-110 F$fast_speed
+LINEAR D-119 F$slow_speed
+				
+; Waits for the probe input to capture the axis positions.
+WAIT ((TASKSTATUS(DATAITEM_TaskStatus0) & TASKSTATUS0_ProbeCycle) == 0) -1
 
-FOR $loop_var = 1 TO $samples
-	$total = $total + ($AI0.0-0.888204)*(4.395305-0.888204)
-NEXT
-$height = $total/$samples
-POSOFFSET SET D-$height
+; Backstep probe for slower measurement
+INCREMENTAL
+G1 D$backstep_dist F$backstep_speed
+
+; Starts probe monitoring again.
+PROBE ON D
+
+; Move down for measurement
+INCREMENTAL
+LINEAR D-1 F$measure_speed
+
+; Waits for the probe input to capture the axis positions.
+WAIT ((TASKSTATUS(DATAITEM_TaskStatus0) & TASKSTATUS0_ProbeCycle) == 0) -1
 
 ; Retract probe
 $DO0.0=1
 
+; Move stage to ceiling
 ABSOLUTE
-LINEAR D80 F$fast_speed
+LINEAR D0 F$fast_speed
+
+; Flip origin
+$new_origin_z = -$origin_z
+
+POSOFFSET SET D$new_origin_z
+
+; Read in current alignment values
+$hFile = FILEOPEN "probe_origin.dat", 1
+FILEREAD $hFile, 0, $old_origin_x, $old_origin_y, $old_origin_z
+FILECLOSE $hFile
+
+; Write updated origin location to file
+$hFile = FILEOPEN "probe_origin.dat", 0
+FILEWRITE $hFile, $old_origin_x, " ", $old_origin_y, " ", $origin_z
+FILECLOSE $hFile
+
+MSGDISPLAY 1, "Complete Z alignment using probe."
+MSGSHOW
+
+;Deprecated Analog measurement version
+;$height = ($AI0.0-0.888204)*(4.395305-0.888204)
+;WHILE $height < 2 DO
+;	; Move down towards micrometer
+;	INCREMENTAL
+;	LINEAR D-$slow_step F$slow_speed
+;	$height = ($AI0.0-0.888204)*(4.395305-0.888204)
+;	MSGDISPLAY 1, $height
+;ENDWHILE
+;DWELL $settle_time
+;FOR $loop_var = 1 TO $samples
+;	$total = $total + ($AI0.0-0.888204)*(4.395305-0.888204)
+;NEXT
+;$height = $total/$samples
+;POSOFFSET SET D-$height

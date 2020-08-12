@@ -16,8 +16,18 @@ MSGCLEAR -1
 MSGDISPLAY 1, "Running alignment of all Tools"
 MSGSHOW
 
+; Clear all fixture offsets
+G53
+
+; Clear all current position offsets
+POSOFFSET CLEAR X Y U A B C D
+
+
 ;Calibrate A
-G90 G1 X$A_x Y$A_y F50
+G90 G1 A0 B0 C0 D0 F10
+G90 G1 X0 Y0
+G90 G1 Y$A_y F50
+G90 G1 X$A_x F50
 FARCALL "MICROMEASURE.pgm" A1
 
 ;Calibrate B
@@ -28,12 +38,10 @@ FARCALL "MICROMEASURE.pgm" A2
 G90 G1 X$C_x Y$C_y F50
 FARCALL "MICROMEASURE.pgm" A3
 
-;Calibrate D
-G90 G1 X$D_x Y$D_y F50
-FARCALL "MICROMEASURE.pgm" A4
-
-G90 G1 A0 B0 C0 D0 F10
-G90 G1 X0 Y0 F50
+ABSOLUTE
+LINEAR A0 B0 C0 D0 F10
+LINEAR X0 F50
+LINEAR Y0 F50
 
 MSGDISPLAY 1, "Complete alignment of all Tools"
 MSGSHOW
