@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<MachineConfiguration version="1.00">
+	<ActiveParameterFile>C:\Users\Public\Documents\Aerotech\A3200\User Files\4 Z AXES_164764-B-1-1_1-03-2018.prma</ActiveParameterFile>
+	<RemoteServerSetup>
+		<EnableLocalClient>0</EnableLocalClient>
+		<LocalClientPort>10025</LocalClientPort>
+		<EnableLocalServer>0</EnableLocalServer>
+		<LocalServerPort>10024</LocalServerPort>
+		<RemoteServerPort>10024</RemoteServerPort>
+		<RemoteServerIPAddress>192.168.0.1</RemoteServerIPAddress>
+		<WatchdogTimeoutLocalClient>1000</WatchdogTimeoutLocalClient>
+		<WatchdogTimeoutLocalServer>10000</WatchdogTimeoutLocalServer>
+		<SendReceiveTimeout>5000</SendReceiveTimeout>
+	</RemoteServerSetup>
+	<FireWireSetup>
+		<PCIBusNumber>-1</PCIBusNumber>
+		<PCIDeviceID>0</PCIDeviceID>
+		<PCIFunctionNumber>-1</PCIFunctionNumber>
+		<PCIDeviceNumber>-1</PCIDeviceNumber>
+		<PCIVendorID>0</PCIVendorID>
+	</FireWireSetup>
+	<CNCOperatorInterface>
+		<CustomizableButtonsFile>C:\ProgramData\Aerotech\A3200\CustomizableButtons.xml</CustomizableButtonsFile>
+	</CNCOperatorInterface>
+	<AccessControl>
+		<ConfigurationFile />
+	</AccessControl>
+	<CalFile1D />
+	<CalFile2D />
+	<CalFileGalvo2D />
+	<CalFileGalvoPowerCorrection />
+	<HyperWireSetup>
+		<PCIBusNumber>-1</PCIBusNumber>
+		<PCIDeviceID>0</PCIDeviceID>
+		<PCIFunctionNumber>-1</PCIFunctionNumber>
+		<PCIDeviceNumber>-1</PCIDeviceNumber>
+		<PCIVendorID>0</PCIVendorID>
+	</HyperWireSetup>
+	<ProgramAutomation>
+		<ProgramEntry>
+			<Path>C:\Users\Public\Documents\Aerotech\A3200\User Files\Rob W\include.pgm</Path>
+			<TaskMask>0</TaskMask>
+			<ExecuteType>0</ExecuteType>
+		</ProgramEntry>
+		<ProgramEntry>
+			<Path>C:\Users\Public\Documents\Aerotech\A3200\User Files\Rob W\initialization.pgm</Path>
+			<TaskMask>2</TaskMask>
+			<ExecuteType>2</ExecuteType>
+		</ProgramEntry>
+		<ProgramEntry>
+			<Path>C:\Users\Public\Documents\Aerotech\A3200\User Files\Rob W\measureAll.PGM</Path>
+			<TaskMask>0</TaskMask>
+			<ExecuteType>1</ExecuteType>
+		</ProgramEntry>
+		<ProgramEntry>
+			<Path>C:\Users\Public\Documents\Aerotech\A3200\User Files\Rob W\microMeasure.pgm</Path>
+			<TaskMask>0</TaskMask>
+			<ExecuteType>1</ExecuteType>
+		</ProgramEntry>
+		<ProgramEntry>
+			<Path>C:\Users\Public\Documents\Aerotech\A3200\User Files\Rob W\offsetManager.pgm</Path>
+			<TaskMask>0</TaskMask>
+			<ExecuteType>1</ExecuteType>
+		</ProgramEntry>
+		<ProgramEntry>
+			<Path>C:\Users\Public\Documents\Aerotech\A3200\User Files\Rob W\probeMeasure.pgm</Path>
+			<TaskMask>0</TaskMask>
+			<ExecuteType>1</ExecuteType>
+		</ProgramEntry>
+		<ProgramEntry>
+			<Path>C:\Users\Public\Documents\Aerotech\A3200\User Files\Rob W\togglePress.pgm</Path>
+			<TaskMask>0</TaskMask>
+			<ExecuteType>1</ExecuteType>
+		</ProgramEntry>
+		<ProgramEntry>
+			<Path>C:\Users\Public\Documents\Aerotech\A3200\User Files\Rob W\XYalignCamera.pgm</Path>
+			<TaskMask>0</TaskMask>
+			<ExecuteType>1</ExecuteType>
+		</ProgramEntry>
+		<ProgramEntry>
+			<Path>C:\Users\Public\Documents\Aerotech\A3200\User Files\Rob W\XYalignCamera.pgm</Path>
+			<TaskMask>0</TaskMask>
+			<ExecuteType>1</ExecuteType>
+		</ProgramEntry>
+		<ProgramEntry>
+			<Path>C:\Users\Public\Documents\Aerotech\A3200\User Files\Rob W\XYalignProbe.pgm</Path>
+			<TaskMask>0</TaskMask>
+			<ExecuteType>1</ExecuteType>
+		</ProgramEntry>
+		<ProgramEntry>
+			<Path>C:\Users\Public\Documents\Aerotech\A3200\User Files\Rob W\micrometerSwitch.pgm</Path>
+			<TaskMask>0</TaskMask>
+			<ExecuteType>1</ExecuteType>
+		</ProgramEntry>
+	</ProgramAutomation>
+</MachineConfiguration>

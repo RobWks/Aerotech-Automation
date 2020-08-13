@@ -1,7 +1,7 @@
 DVAR $micPort
 
 ; Connect to micrometer
-$micPort = FILEOPEN "COM3", 2
+$micPort = FILEOPEN "COM4", 2
 COMMINIT $micPort, "baud=115200 parity=N data=8 stop=1"
 COMMSETTIMEOUT $micPort, -1, -1, 1000
 

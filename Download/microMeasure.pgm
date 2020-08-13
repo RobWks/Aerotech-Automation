@@ -43,6 +43,10 @@ G53
 ; Clear all current position offsets
 POSOFFSET CLEAR X Y U A B C D
 
+; Set high default accelerations
+G65 F2000; accel speed mm/s^2
+G66 F2000;accel speed mm/s^2
+
 ; Convert function argument to axis name
 IF $axis_option == 1 THEN
 	$strglob[0] = "A"

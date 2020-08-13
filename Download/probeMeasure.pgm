@@ -15,7 +15,7 @@ DVAR $new_origin_z
 $fast_speed = 10
 $slow_speed = 1
 $backstep_speed = 0.1
-$backstep_dist = 0.3
+$backstep_dist = 0.5
 $measure_speed = 0.01
 $probe_dwell = 2
 

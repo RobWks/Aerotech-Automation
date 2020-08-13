@@ -1,0 +1,373 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Configuration version="1.0" xmlns="http://www.aerotech.com/xsd/Controller/CustomizableButtons/2010/">
+      <Pages>
+            <Page name="Axis Control">
+                  <Buttons>
+                        <Button shortcut="F7" name="Enable/Disable All" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="All Disabled">
+                                          <Text>Enable / Disable All Axes</Text>
+                                          <Action>
+                                                <Code>ENABLE X Y A B C D</Code>
+                                          </Action>
+                                    </DefaultState>
+                                    <State name="All Enabled">
+                                          <Text>Enable / Disable All Axes</Text>
+                                          <BackColor>ff00ff00</BackColor>
+                                          <Condition>
+                                                <Operand>
+                                                      <DataItem>
+                                                            <Context>Axis</Context>
+                                                            <ContextKey>0</ContextKey>
+                                                            <Id>DriveStatus</Id>
+                                                            <OptionalArgument>1</OptionalArgument>
+                                                      </DataItem>
+                                                </Operand>
+                                                <ComparisonOperator>EQ</ComparisonOperator>
+                                                <Operand>
+                                                      <Constant>1</Constant>
+                                                </Operand>
+                                          </Condition>
+                                          <Action>
+                                                <Code>DISABLE X Y A B C D</Code>
+                                          </Action>
+                                    </State>
+                              </States>
+                        </Button>
+                        <Button shortcut="F8" name="Home XY" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Home XY">
+                                          <Text>Home XY</Text>
+                                          <Action>
+                                                <Code>HOME X Y</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="F10" name="Toggle Pressure 1" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Toggle Pressure 1">
+                                          <Text>Toggle Pressure Box 1</Text>
+                                          <Action>
+                                                <Code>FARCALL "togglePress.pgm" P1</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="F11" name="Toggle Pressure 2" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Toggle Pressure 2">
+                                          <Text>Toggle Pressure Box 2</Text>
+                                          <Action>
+                                                <Code>FARCALL "togglePress.pgm" P2</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="F12" name="Toggle Pressure 3" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Toggle Pressure 3">
+                                          <Text>Toggle Pressure Box 3</Text>
+                                          <Action>
+                                                <Code>FARCALL "togglePress.pgm" P3</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF7" name="Zero X" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Zero X">
+                                          <Text>Zero X</Text>
+                                          <Action>
+                                                <Code>POSOFFSET SET X0</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF8" name="Zero Y" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Zero Y">
+                                          <Text>Zero Y</Text>
+                                          <Action>
+                                                <Code>POSOFFSET SET Y0</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF9" name="Zero A" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Zero A">
+                                          <Text>Zero A</Text>
+                                          <Action>
+                                                <Code>POSOFFSET SET A0</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF10" name="Zero B" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Zero B">
+                                          <Text>Zero B</Text>
+                                          <Action>
+                                                <Code>POSOFFSET SET B0</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF11" name="Zero C" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Zero C">
+                                          <Text>Zero C</Text>
+                                          <Action>
+                                                <Code>POSOFFSET SET C0</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF12" name="Zero D" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Zero D">
+                                          <Text>Zero D</Text>
+                                          <Action>
+                                                <Code>POSOFFSET SET D0</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="F9" name="Home Z" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Home Z">
+                                          <Text>Home All Z Axes</Text>
+                                          <Action>
+                                                <Code>HOME A B C D</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                  </Buttons>
+            </Page>
+            <Page name="Alignment Control">
+                  <Buttons>
+                        <Button shortcut="F7" name="Probe Coordinate System" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Switch to Probe">
+                                          <Text>Switch to Probe Coordinate System (G30)</Text>
+                                          <Action>
+                                                <Code>FARCALL "offsetManager.pgm" A4</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF7" name="Switch to Tool A" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Switch to Tool A">
+                                          <Text>Switch to Tool A Coordinate System (G31)</Text>
+                                          <Action>
+                                                <Code>FARCALL "offsetManager.pgm" A1</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="F8" name="Switch to Tool B" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Switch to Tool B">
+                                          <Text>Switch to Tool B Coordinate System (G32)</Text>
+                                          <Action>
+                                                <Code>FARCALL "offsetManager.pgm" A2</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF8" name="Switch to Tool C" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Switch to Tool C">
+                                          <Text>Switch to Tool C Coordinate System (G33)</Text>
+                                          <Action>
+                                                <Code>FARCALL "offsetManager.pgm" A3</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF12" name="Measure Probe" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Measure Probe">
+                                          <Text>Measure Probe</Text>
+                                          <Action>
+                                                <Code>FARCALL "microMeasure.pgm" A4</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="F9" name="Measure Tool A" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Measure Tool A">
+                                          <Text>Measure Tool A (G34)</Text>
+                                          <Action>
+                                                <Code>FARCALL "microMeasure.pgm" A1</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF9" name="Measure Tool B" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Measure Tool B">
+                                          <Text>Measure Tool B (G35)</Text>
+                                          <Action>
+                                                <Code>FARCALL "microMeasure.pgm" A2</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="F10" name="Measure Tool C" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Measure Tool C">
+                                          <Text>Measure Tool C (G36)</Text>
+                                          <Action>
+                                                <Code>FARCALL "microMeasure.pgm" A3</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="F12" name="Align XY with Camera" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Align XY with Camera">
+                                          <Text>Align XY with Camera</Text>
+                                          <Action>
+                                                <Code>FARCALL "XYalignCamera.pgm"</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="F11" name="Align Z" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Align Z">
+                                          <Text>Align Z with Probe (G38)</Text>
+                                          <Action>
+                                                <Code>FARCALL "probeMeasure.pgm"</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF10" name="Measure All" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Measure All">
+                                          <Text>Measure All Tools in Standard Positioning (G37)</Text>
+                                          <Action>
+                                                <Code>FARCALL "measureAll.pgm"</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF11" name="Align XY with Probe" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Align XY with Probe">
+                                          <Text>Align XY with Probe (G39)</Text>
+                                          <Action>
+                                                <Code>FARCALL "XYalignProbe.pgm"</Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                  </Buttons>
+            </Page>
+            <Page name="Additional Commands">
+                  <Buttons>
+                        <Button shortcut="F7" name="Switch Micrometer" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="XZ View">
+                                          <Text>Switch Micrometer to XY view</Text>
+                                          <Action>
+                                                <Code>FARCALL "micrometerSwitch.pgm"</Code>
+                                          </Action>
+                                    </DefaultState>
+                                    <State name="XY View">
+                                          <Text>Switch to Micrometer XZ View</Text>
+                                          <BackColor>ff00ff00</BackColor>
+                                          <Condition>
+                                                <Operand>
+                                                      <DataItem>
+                                                            <Context>Axis</Context>
+                                                            <ContextKey>0</ContextKey>
+                                                            <Id>DigitalOutput</Id>
+                                                            <OptionalArgument>128</OptionalArgument>
+                                                      </DataItem>
+                                                </Operand>
+                                                <ComparisonOperator>EQ</ComparisonOperator>
+                                                <Operand>
+                                                      <Constant>0</Constant>
+                                                </Operand>
+                                          </Condition>
+                                          <Action>
+                                                <Code>FARCALL "micrometerSwitch.pgm"</Code>
+                                          </Action>
+                                    </State>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF7" name="Probe Position" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Probe Retracted">
+                                          <Text>Deploy Probe</Text>
+                                          <Action>
+                                                <Code>$DO0.0=0</Code>
+                                          </Action>
+                                    </DefaultState>
+                                    <State name="Probe Deployed">
+                                          <Text>Retract Probe</Text>
+                                          <BackColor>ff00ff00</BackColor>
+                                          <Condition>
+                                                <Operand>
+                                                      <DataItem>
+                                                            <Context>Axis</Context>
+                                                            <ContextKey>0</ContextKey>
+                                                            <Id>DigitalOutput</Id>
+                                                            <OptionalArgument>1</OptionalArgument>
+                                                      </DataItem>
+                                                </Operand>
+                                                <ComparisonOperator>EQ</ComparisonOperator>
+                                                <Operand>
+                                                      <Constant>0</Constant>
+                                                </Operand>
+                                          </Condition>
+                                          <Action>
+                                                <Code>$DO0.0=1</Code>
+                                          </Action>
+                                    </State>
+                              </States>
+                        </Button>
+                        <Button shortcut="F8" name="Clean Tool A" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Clean Tool A">
+                                          <Text>Clean Tool A</Text>
+                                          <Action>
+                                                <Code>
+                                                </Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="ShiftF8" name="Clean Tool B" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Clean Tool B">
+                                          <Text>Clean Tool B</Text>
+                                          <Action>
+                                                <Code>
+                                                </Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                        <Button shortcut="F9" name="Clean Tool C" showShortcutText="true">
+                              <States>
+                                    <DefaultState name="Clean Tool C">
+                                          <Text>Clean Tool C</Text>
+                                          <Action>
+                                                <Code>
+                                                </Code>
+                                          </Action>
+                                    </DefaultState>
+                              </States>
+                        </Button>
+                  </Buttons>
+            </Page>
+      </Pages>
+</Configuration>
